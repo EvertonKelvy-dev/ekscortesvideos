@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07080d">
+  <title>EKScortesvideos · Cortes de vídeo com IA</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="fundo" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="fita" aria-hidden="true"></div>
+
+  <header>
+    <div class="marca">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <linearGradient id="gl" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff3d71"/><stop offset=".55" stop-color="#ff5a3c"/><stop offset="1" stop-color="#ffb23c"/>
+          </linearGradient>
+        </defs>
+        <rect width="64" height="64" rx="17" fill="url(#gl)"/>
+        <path d="M25 17v30l23-15z" fill="#fff"/>
+        <path d="M9 55 55 9" stroke="#07080d" stroke-width="5.5" stroke-linecap="round"/>
+      </svg>
+      <h1>EKS<span>cortesvideos</span></h1>
+    </div>
+    <p class="slogan">Do vídeo longo aos <b>melhores momentos</b>, em minutos.</p>
+    <ul class="passos">
+      <li><b>1</b> Envie o vídeo</li>
+      <li><b>2</b> A IA escolhe os cortes</li>
+      <li><b>3</b> Baixe e poste</li>
+    </ul>
+    <p id="status" class="status off" role="status"><i></i><span id="status-txt">Procurando o programa…</span></p>
+  </header>
+
+  <main>
+    <section id="offline" class="painel" hidden>
+      <h2>Ligue o programa no seu PC</h2>
+      <p class="suave">Esta página é só a tela de controle. Os vídeos são processados no seu computador, por um
+        programa que você liga com dois cliques, e nada é enviado para a internet.</p>
+      <ol class="guia">
+        <li>Baixe o programa e extraia a pasta.
+          <a id="baixar-projeto" class="botao" href="#" hidden>⬇ Baixar o programa (.zip)</a></li>
+        <li>Dê dois cliques em <b>iniciar.bat</b> (Windows) ou rode <b>./iniciar.sh</b> (Mac/Linux). Deixe a janela preta aberta.</li>
+        <li>Volte aqui e clique em <b>Conectar</b>. Se o navegador perguntar se este site pode acessar a rede local, clique em <b>Permitir</b>.</li>
+      </ol>
+      <button id="conectar" class="primario"><span>🔌 Conectar ao programa</span></button>
+      <p id="offline-msg" class="erro" hidden></p>
+    </section>
+
+    <section id="formulario" class="painel">
+      <div class="abas" role="tablist">
+        <button class="aba ativa" data-fonte="arquivo">📁 Enviar arquivo</button>
+        <button class="aba" data-fonte="link">🔗 Colar link</button>
+      </div>
+
+      <div id="area-arquivo">
+        <label id="drop" for="arquivo">
+          <svg class="icone-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+          </svg>
+          <strong id="drop-texto">Arraste o vídeo aqui ou clique para escolher</strong>
+          <small>MP4, MOV, MKV, WEBM…</small>
+        </label>
+        <input type="file" id="arquivo" accept="video/*,audio/*" hidden>
+      </div>
+      <div id="area-link" hidden>
+        <input type="url" id="link" placeholder="https://www.youtube.com/watch?v=…">
+      </div>
+
+      <div class="grade">
+        <div>
+          <span class="rotulo">Tipo de corte</span>
+          <div class="seg" id="modo">
+            <button class="ativa" data-modo="curto">Curtos <small>20–60s</small></button>
+            <button data-modo="longo">Longos <small>3–10 min</small></button>
+          </div>
+        </div>
+        <label>
+          <span class="rotulo">Quantidade</span>
+          <input type="number" id="qtd" value="5" min="1" max="20">
+        </label>
+        <label>
+          <span class="rotulo">Precisão da transcrição</span>
+          <select id="whisper">
+            <option value="base">Rápida (base)</option>
+            <option value="small" selected>Equilibrada (small)</option>
+            <option value="medium">Alta (medium)</option>
+            <option value="large-v3">Máxima (large-v3)</option>
+          </select>
+        </label>
+        <label>
+          <span class="rotulo">Idioma</span>
+          <select id="idioma">
+            <option value="">Detectar</option>
+            <option value="pt">Português</option>
+            <option value="en">Inglês</option>
+            <option value="es">Espanhol</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="larga fala">
+        <span class="rotulo">Usar a fala do vídeo?</span>
+        <select id="fala">
+          <option value="auto" selected>Automático (recomendado)</option>
+          <option value="sim">Sim, transcrever a fala</option>
+          <option value="nao">Não, só áudio e movimento (gameplay sem comentário)</option>
+        </select>
+        <small class="dica">Automático usa a fala quando existe e, se o vídeo for quase mudo ou a fala render poucos
+          cortes, completa pelos momentos de mais ação. “Não” pula a transcrição e fica bem mais rápido.</small>
+      </label>
+
+      <button id="gerar" class="primario"><span>✂️ Gerar cortes</span></button>
+      <p id="erro" class="erro" hidden></p>
+    </section>
+
+    <section id="progresso" class="painel" hidden>
+      <h2 id="prog-titulo">Processando…</h2>
+      <div class="barra"><i id="barra"></i></div>
+      <ol id="etapas"></ol>
+      <p id="prog-msg" class="suave"></p>
+    </section>
+
+    <section id="resultado" hidden>
+      <div class="topo-res">
+        <h2 id="res-titulo"></h2>
+        <div>
+          <a id="zip" class="botao" href="#">⬇ Baixar todos (.zip)</a>
+          <button id="novo" class="botao">Novo vídeo</button>
+        </div>
+      </div>
+      <p id="res-aviso" class="aviso" hidden></p>
+      <div id="cortes"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span class="mini-logo">✂</span> <b>EKScortesvideos</b> · Whisper + Claude + ffmpeg
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
